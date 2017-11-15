@@ -5,21 +5,19 @@
 // Servo
 Servo gateKeeper;
 // Locked Position
-int lockedPos=80;
+int lockedPos=90;
 // Unlocked Position
 int unlockedPos=180;
 // Analog Output Pin
-int analogOutput = A0;
+int analogOutput = A7;
 // Closed LED
-int closedLED = D0;
+int closedLED = D3;
 // Open LED
-int openLED = D1;
+int openLED = D4;
 // Digital Input Pin for Switch
-int dIn = D2;
+int dIn = D1;
 // Piezo Speaker Pin
-int spkr = D3;
-// Digital Output Pin for Switch
-int dOut = D6;
+int spkr = D6;
 // Current state (0=Closed, 1=Open)
 int currentState = 1;
 // Open lock state
@@ -40,11 +38,8 @@ void setup()
    pinMode(openLED,OUTPUT);
    pinMode(dIn,INPUT_PULLDOWN);
    pinMode(spkr,OUTPUT);
-   pinMode(dOut,OUTPUT);
    // Start with our servo in the locked position by default
    closeLock();
-   // Set digital output pin for switch to high
-   digitalWrite(dOut,HIGH);
 }
 
 void loop()
