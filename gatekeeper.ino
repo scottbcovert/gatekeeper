@@ -18,7 +18,7 @@ int openLED = D4;
 int dIn = D1;
 // Piezo Speaker Pin
 int spkr = D6;
-// Current state (0=Closed, 1=Open)
+// Current state - used for manually toggling lock state
 int currentState = 1;
 // Open lock state
 String openLockState = "open";
@@ -32,7 +32,7 @@ void setup()
    // Register toggleLock function to make it accessible from the cloud
    Particle.function("toggleLock",toggleLock);
    // Register lockState variable to make it accessible from the cloud
-   Particle.variable("lockState",&lockState,STRING);
+   Particle.variable("lockState",lockState);
    // Set LED, dIn, & Piezo Pin Modes
    pinMode(closedLED,OUTPUT);
    pinMode(openLED,OUTPUT);
