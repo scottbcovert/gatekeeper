@@ -26,6 +26,14 @@ String openLockState = "open";
 String closeLockState = "close";
 // Current lock state
 String lockState = "close";
+// Timestamp of last time sync with Particle
+long lastSync = millis();
+// Timestamp of last lock state change
+long lastLockStateChange = millis();
+// Constant representing five minutes in milliseconds
+long FIVE_MIN_MILLIS = (5 * 60 * 1000);
+// Constant representing one day in milliseconds
+long ONE_DAY_MILLIS = (24 * 60 * 60 * 1000);
 
 void setup()
 {
@@ -44,13 +52,18 @@ void setup()
 
 void loop()
 {
-    if (digitalRead(dIn) == LOW && currentState == 0){
-        changeLockState();
-        currentState = 1;
+    // Request time synchronization from the Particle Cloud once a day
+    if (millis() - lastSync > ONE_DAY_MILLIS) {
+        Particle.syncTime();
+        lastSync = millis();
     }
-    else if (digitalRead(dIn) == HIGH && currentState == 1){
+    // Auto-lock after five minutes
+    if (lockState == openLockState && millis() - lastLockStateChange > FIVE_MIN_MILLIS) {
+        toggleLock(closeLockState);
+    }
+    else if ((digitalRead(dIn) == LOW && currentState == 0) || (digitalRead(dIn) == HIGH && currentState == 1)){
+        changeCurrentState();
         changeLockState();
-        currentState = 0;
     }
 }
 
@@ -106,6 +119,13 @@ void changeLockState() {
         toggleLock(openLockState);
 }
 
+void changeCurrentState() {
+    if (currentState == 0)
+        currentState = 1;
+    else if (currentState == 1)
+        currentState = 0;
+}
+
 // This function will be called through an API request to toggle the lock's position
 
 int toggleLock(String command) {
@@ -127,6 +147,8 @@ int toggleLock(String command) {
         closeLock();
     else
         return -1; // Bad command
+    // Update last lock state change timestamp
+    lastLockStateChange = millis();
     delay(1000);
     // Detach servo to prevent buzzing
     gateKeeper.detach();
