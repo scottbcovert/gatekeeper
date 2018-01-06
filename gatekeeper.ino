@@ -37,6 +37,9 @@ long ONE_DAY_MILLIS = (24 * 60 * 60 * 1000);
 
 void setup()
 {
+   // Turn off Bluz LED to conserve battery power
+   RGB.control(true);
+   RGB.color(0, 0, 0);
    // Register toggleLock function to make it accessible from the cloud
    Particle.function("toggleLock",toggleLock);
    // Register lockState variable to make it accessible from the cloud
@@ -65,6 +68,8 @@ void loop()
         changeCurrentState();
         changeLockState();
     }
+    // Place CPU in sleep mode to conserve battery power
+    System.sleep(SLEEP_MODE_CPU);
 }
 
 void beep() {
