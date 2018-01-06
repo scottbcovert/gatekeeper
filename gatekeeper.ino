@@ -26,16 +26,22 @@ String openLockState = "open";
 String closeLockState = "close";
 // Current lock state
 String lockState = "close";
+// Battery voltage
+double batteryVoltage = (readSupplyVoltage() / 1024.0) * 3.6;
 // Timestamp of last time sync with Particle
 long lastSync = millis();
 // Timestamp of last lock state change
 long lastLockStateChange = millis();
 // Timestamp of last lock state reminder
 long lastLockStateReminder = millis();
+// Timestamp of last battery check
+long lastBatteryCheck = millis();
 // Constant representing five seconds in milliseconds
 long FIVE_SEC_MILLIS = (5 * 1000);
 // Constant representing five minutes in milliseconds
 long FIVE_MIN_MILLIS = (5 * 60 * 1000);
+// Constant representing one hour in milliseconds
+long ONE_HOUR_MILLIS = (60 * 60 * 1000);
 // Constant representing one day in milliseconds
 long ONE_DAY_MILLIS = (24 * 60 * 60 * 1000);
 
@@ -48,6 +54,8 @@ void setup()
    Particle.function("toggleLock",toggleLock);
    // Register lockState variable to make it accessible from the cloud
    Particle.variable("lockState",lockState);
+   // Register batteryVoltage variable to make it accessible from the cloud
+   Particle.variable("battVoltage",batteryVoltage);
    // Set LED, dIn, & Piezo Pin Modes
    pinMode(closedLED,OUTPUT);
    pinMode(openLED,OUTPUT);
@@ -73,10 +81,19 @@ void loop()
             flashCloseStateLED();
         }
     }
+    // Check battery level every hour
+    if (millis() - lastBatteryCheck > ONE_HOUR_MILLIS) {
+        batteryVoltage = (readSupplyVoltage() / 1024.0) * 3.6;
+        if (batteryVoltage < 3) {
+            Particle.publish("Battery Low!", String(batteryVoltage));
+        }
+        lastBatteryCheck = millis();
+    }
     // Auto-lock after five minutes
     if (lockState == openLockState && millis() - lastLockStateChange > FIVE_MIN_MILLIS) {
         toggleLock(closeLockState);
     }
+    // Toggle lock when push button is pressed
     else if ((digitalRead(dIn) == LOW && currentState == 0) || (digitalRead(dIn) == HIGH && currentState == 1)){
         changeCurrentState();
         changeLockState();
