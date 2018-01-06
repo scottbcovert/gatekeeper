@@ -30,6 +30,10 @@ String lockState = "close";
 long lastSync = millis();
 // Timestamp of last lock state change
 long lastLockStateChange = millis();
+// Timestamp of last lock state reminder
+long lastLockStateReminder = millis();
+// Constant representing five seconds in milliseconds
+long FIVE_SEC_MILLIS = (5 * 1000);
 // Constant representing five minutes in milliseconds
 long FIVE_MIN_MILLIS = (5 * 60 * 1000);
 // Constant representing one day in milliseconds
@@ -60,6 +64,15 @@ void loop()
         Particle.syncTime();
         lastSync = millis();
     }
+    // Flash one of the LEDs as a lock state reminder every five seconds
+    if (millis() - lastLockStateReminder > FIVE_SEC_MILLIS) {
+        if (lockState == openLockState) {
+            flashOpenStateLED();
+        }
+        else {
+            flashCloseStateLED();
+        }
+    }
     // Auto-lock after five minutes
     if (lockState == openLockState && millis() - lastLockStateChange > FIVE_MIN_MILLIS) {
         toggleLock(closeLockState);
@@ -84,21 +97,29 @@ void beepTwice() {
     beep();
 }
 
-void openStateLED() {
+void flashOpenStateLED() {
     digitalWrite(openLED,HIGH);
-    digitalWrite(closedLED,LOW);
+    delay(100);
+    digitalWrite(openLED,LOW);
+    lastLockStateReminder = millis();
 }
 
-void closeStateLED() {
-    digitalWrite(openLED,LOW);
+void flashCloseStateLED() {
     digitalWrite(closedLED,HIGH);
+    delay(100);
+    digitalWrite(closedLED,LOW);
+    delay(50);
+    digitalWrite(closedLED,HIGH);
+    delay(100);
+    digitalWrite(closedLED,LOW);
+    lastLockStateReminder = millis();
 }
 
 void toggleLEDs(String lockState) {
     if (lockState == openLockState)
-        openStateLED();
+        flashOpenStateLED();
     else if (lockState == closeLockState)
-        closeStateLED();
+        flashCloseStateLED();
 }
 
 void openLock() {
