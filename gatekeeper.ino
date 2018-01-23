@@ -36,14 +36,10 @@ long lastLockStateChange = millis();
 long lastLockStateReminder = millis();
 // Timestamp of last battery check
 long lastBatteryCheck = millis();
-// Constant representing five seconds in milliseconds
-long FIVE_SEC_MILLIS = (5 * 1000);
 // Constant representing five minutes in milliseconds
 long FIVE_MIN_MILLIS = (5 * 60 * 1000);
 // Constant representing one hour in milliseconds
 long ONE_HOUR_MILLIS = (60 * 60 * 1000);
-// Constant representing one day in milliseconds
-long ONE_DAY_MILLIS = (24 * 60 * 60 * 1000);
 
 void setup()
 {
@@ -67,20 +63,6 @@ void setup()
 
 void loop()
 {
-    // Request time synchronization from the Particle Cloud once a day
-    if (millis() - lastSync > ONE_DAY_MILLIS) {
-        Particle.syncTime();
-        lastSync = millis();
-    }
-    // Flash one of the LEDs as a lock state reminder every five seconds
-    if (millis() - lastLockStateReminder > FIVE_SEC_MILLIS) {
-        if (lockState == openLockState) {
-            flashOpenStateLED();
-        }
-        else {
-            flashCloseStateLED();
-        }
-    }
     // Check battery level every hour
     if (millis() - lastBatteryCheck > ONE_HOUR_MILLIS) {
         batteryVoltage = (readSupplyVoltage() / 1024.0) * 3.6;
