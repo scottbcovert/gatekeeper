@@ -46,6 +46,13 @@ void setup()
    // Turn off Bluz LED to conserve battery power
    RGB.control(true);
    RGB.color(0, 0, 0);
+   // Lower transmit power to -30dBm to conserve battery power
+   BLE.setTxPower(-30);
+   // Set a higher advertising interval to conserve battery power
+   BLE.setAdvertisingInterval(2000);
+   // Set longer connection parameters to suggest to Bluz Gateway to conserve battery power
+   // This also requlred adding 'gateway.set_connection_parameters(475,500);' to Bluz Gateway setup code
+   BLE.setConnectionParameters(275,300);
    // Register toggleLock function to make it accessible from the cloud
    Particle.function("toggleLock",toggleLock);
    // Register lockState variable to make it accessible from the cloud
