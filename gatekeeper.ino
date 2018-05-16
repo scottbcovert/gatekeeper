@@ -36,6 +36,8 @@ long lastLockStateChange = millis();
 long lastLockStateReminder = millis();
 // Timestamp of last battery check
 long lastBatteryCheck = millis();
+// Constant representing five seconds in milliseconds
+long FIVE_SEC_MILLIS = (5 * 1000);
 // Constant representing five minutes in milliseconds
 long FIVE_MIN_MILLIS = (5 * 60 * 1000);
 // Constant representing one hour in milliseconds
@@ -70,6 +72,15 @@ void setup()
 
 void loop()
 {
+    // Flash one of the LEDs as a lock state reminder every five seconds
+    if (millis() - lastLockStateReminder > FIVE_SEC_MILLIS) {
+        if (lockState == openLockState) {
+            flashOpenStateLED();
+        }
+        else {
+            flashCloseStateLED();
+        }
+    }
     // Check battery level every hour
     if (millis() - lastBatteryCheck > ONE_HOUR_MILLIS) {
         batteryVoltage = (readSupplyVoltage() / 1024.0) * 3.6;
